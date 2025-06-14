@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Academic Planner</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f4ff; }
+    header, nav, main { padding: 20px; }
+    header { background: #2a60c0; color: white; }
+    nav a { margin: 0 10px; color: #2a60c0; text-decoration: none; font-weight: bold; }
+    section { margin: 20px 0; }
+    .todo input { margin-right: 10px; }
+    .task { display: flex; align-items: center; margin: 5px 0; }
+    .task.completed span { text-decoration: line-through; color: gray; }
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+    .day { background: white; padding: 10px; border: 1px solid #ccc; }
+    #timer { font-size: 2em; margin: 10px 0; }
+    button { margin: 5px; padding: 5px 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Student Academic Planner</h1>
+    <p id="quote">"Push yourself, because no one else is going to do it for you."</p>
+    <button onclick="changeQuote()">New Quote</button>
+  </header>
+
+  <nav>
+    <a href="#subjects">Subjects</a>
+    <a href="#todo">To-Do</a>
+    <a href="#calendar">Calendar</a>
+    <a href="#timer-section">Pomodoro Timer</a>
+  </nav>
+
+  <main>
+    <!-- Subjects -->
+    <section id="subjects">
+      <h2>Your Subjects & Grades</h2>
+      <ul id="subject-list"></ul>
+    </section>
+
+    <!-- To-Do List -->
+    <section id="todo">
+      <h2>To-Do List</h2>
+      <input type="text" id="new-task" placeholder="New Task" />
+      <button onclick="addTask()">Add Task</button>
+      <ul id="task-list"></ul>
+    </section>
+
+    <!-- Calendar View -->
+    <section id="calendar">
+      <h2>Calendar View</h2>
+      <div class="calendar" id="calendar-grid"></div>
+    </section>
+
+    <!-- Pomodoro Timer -->
+    <section id="timer-section">
+      <h2>Pomodoro Study Timer</h2>
+      <div id="timer">25:00</div>
+      <button onclick="startTimer()">Start</button>
+      <button onclick="pauseTimer()">Pause</button>
+      <button onclick="resetTimer()">Reset</button>
+    </section>
+  </main>
+
+  <script>
+    // Motivational Quotes
+    const quotes = [
+      "Push yourself, because no one else is going to do it for you.",
+      "Success doesn't come from what you do occasionally, it comes from what you do consistently.",
+      "Don't watch the clock; do what it does. Keep going.",
+      "The secret of getting ahead is getting started."
+    ];
+    function changeQuote() {
+      const quote = quotes[Math.floor(Math.random() * quotes.length)];
+      document.getElementById("quote").textContent = `"${quote}"`;
+    }
+
+    // Subjects from JSON
+    const subjects = [
+      { subject: "Mathematics", grade: "A" },
+      { subject: "Physics", grade: "B+" },
+      { subject: "Computer Science", grade: "A-" }
+    ];
+    const subjectList = document.getElementById("subject-list");
+    subjects.forEach(sub => {
+      const li = document.createElement("li");
+      li.textContent = `${sub.subject}: ${sub.grade}`;
+      subjectList.appendChild(li);
+    });
+
+    // To-Do List
+    function addTask() {
+      const input = document.getElementById("new-task");
+      const taskText = input.value.trim();
+      if (!taskText) return;
+      const li = document.createElement("li");
+      li.className = "task";
+      li.innerHTML = `<input type='checkbox' onclick='toggleTask(this)' /> <span>${taskText}</span> <button onclick='removeTask(this)'>❌</button>`;
+      document.getElementById("task-list").appendChild(li);
+      input.value = "";
+    }
+    function toggleTask(checkbox) {
+      const task = checkbox.parentElement;
+      task.classList.toggle("completed");
+    }
+    function removeTask(button) {
+      button.parentElement.remove();
+    }
+
+    // Calendar
+    const calendarGrid = document.getElementById("calendar-grid");
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    days.forEach(day => {
+      const div = document.createElement("div");
+      div.className = "day";
+      div.textContent = day;
+      calendarGrid.appendChild(div);
+    });
+    for (let i = 1; i <= 30; i++) {
+      const div = document.createElement("div");
+      div.className = "day";
+      div.textContent = i;
+      calendarGrid.appendChild(div);
+    }
+
+    // Pomodoro Timer
+    let timer;
+    let seconds = 1500;
+    function updateDisplay() {
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      document.getElementById("timer").textContent = `${m}:${s}`;
+    }
+    function startTimer() {
+      if (timer) return;
+      timer = setInterval(() => {
+        if (seconds > 0) {
+          seconds--;
+          updateDisplay();
+        } else {
+          clearInterval(timer);
+          alert("Time's up! Take a break.");
+        }
+      }, 1000);
+    }
+    function pauseTimer() {
+      clearInterval(timer);
+      timer = null;
+    }
+    function resetTimer() {
+      pauseTimer();
+      seconds = 1500;
+      updateDisplay();
+    }
+    updateDisplay();
+  </script>
+</body>
+</html>
